@@ -2,9 +2,22 @@ import React from "react";
 
 export const NewRegistrationPage = () => {
     const [nickname, setNickname] = React.useState("");
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        console.log("onSubmit");
+        const csrfToken = document.querySelector('[name="csrf-token"]').content;
+        const nickname = e.target.elements.nickname.value;
+        try {
+            const registrationRes = await fetch('/registrations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken,
+                },
+                body: JSON.stringify({nickname: nickname}),
+            });
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     return (
@@ -17,7 +30,7 @@ export const NewRegistrationPage = () => {
                         <input type="text" id="nickname" name="nickname" value={nickname} maxLength="16"
                                onInput={(e) => {
                                    setNickname(e.target.value);
-                               }} class="px-4 py-2 text-lg border-solid border-2 border-slate-200 rounded"/>
+                               }} className="px-4 py-2 text-lg border-solid border-2 border-slate-200 rounded"/>
                     </div>
                     <div className="flex flex-col p-2">
                         <button type="sumbit"
