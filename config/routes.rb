@@ -8,6 +8,8 @@ Rails.application.routes.draw do
 
   get "home" => "home#index", as: :home
 
+  resources :registrations, only: %i[new]
+
   # Defines the root path route ("/")
   root "home#index"
 end
