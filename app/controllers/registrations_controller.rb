@@ -35,6 +35,26 @@ class RegistrationsController < ApplicationController
     end
   end
 
+  def callback
+    webauthn_credential = relying_party.verify_registration(
+      params,
+      session.dig("creation_registration", "challenge"),
+      user_verification: true
+    )
+    current_user.credentials.create!(
+      external_id: Base64.strict_encode64(webauthn_credential.raw_id),
+      nickname: params[:nickname],
+      public_key: webauthn_credential.public_key,
+      sign_count: webauthn_credential.sign_count
+    )
+    render json: { status: "ok" }
+  rescue WebAuthn::Error, ActiveRecord::RecordInvalid => e
+    Rails.logger.error { e }
+    render json: { errors: [e.message] }, status: :unprocessable_entity
+  ensure
+    session.delete("current_registration")
+  end
+
   private
 
   def relying_party

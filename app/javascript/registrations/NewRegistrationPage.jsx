@@ -1,20 +1,42 @@
 import React from "react";
+import {
+    create,
+    parseCreationOptionsFromJSON
+} from "@github/webauthn-json/browser-ponyfill";
+
+const getCsrfToken = () => document.querySelector('[name="csrf-token"]').content;
 
 export const NewRegistrationPage = () => {
     const [nickname, setNickname] = React.useState("");
     const onSubmit = async (e) => {
         e.preventDefault();
-        const csrfToken = document.querySelector('[name="csrf-token"]').content;
         const nickname = e.target.elements.nickname.value;
         try {
-            const registrationRes = await fetch('/registrations', {
+            const registration = await fetch('/registrations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,
+                    'X-CSRF-Token': getCsrfToken(),
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify({nickname: nickname}),
             });
+            const json = await registration.json();
+            console.log("json", json);
+            const options = parseCreationOptionsFromJSON({ publicKey: json });
+            const response = await create(options);
+            console.log("response", response);
+            const params = new URLSearchParams({ nickname: nickname });
+            await fetch(`/registrations/callback?${params}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken(),
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(response),
+            });
+            window.location.href = '/';
         } catch (e) {
             console.error(e);
         }
