@@ -8,6 +8,7 @@
     <%= button_to "Log out", destroy_user_session_path, method: :delete, class: 'py-2 px-4 text-slate-50 bg-zinc-500 rounded' %>
   <%- else -%>
     <%= link_to "Log in", new_user_session_path, class: 'py-2 px-4 text-slate-50 bg-blue-500 rounded' %>
+    <%= link_to "Log in with passkey", new_session_path, class: 'py-2 px-4 text-slate-50 bg-blue-500 rounded' %>
     <%= link_to "Sign up", new_user_registration_path, class: 'py-2 px-4 text-slate-50 bg-green-500 rounded'%>
   <%- end -%>
 </div>
