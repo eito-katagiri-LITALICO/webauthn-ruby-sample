@@ -3,8 +3,7 @@ import {
     create,
     parseCreationOptionsFromJSON
 } from "@github/webauthn-json/browser-ponyfill";
-
-const getCsrfToken = () => document.querySelector('[name="csrf-token"]').content;
+import { getCsrfToken } from "../getCsrfToken";
 
 export const NewRegistrationPage = () => {
     const [nickname, setNickname] = React.useState("");
@@ -22,10 +21,8 @@ export const NewRegistrationPage = () => {
                 body: JSON.stringify({nickname: nickname}),
             });
             const json = await registration.json();
-            console.log("json", json);
             const options = parseCreationOptionsFromJSON({ publicKey: json });
             const response = await create(options);
-            console.log("response", response);
             const params = new URLSearchParams({ nickname: nickname });
             await fetch(`/registrations/callback?${params}`, {
                 method: 'POST',

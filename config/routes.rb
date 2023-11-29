@@ -14,7 +14,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :sessions, only: %i[new]
+  resources :sessions, only: %i[new create]
 
   # Defines the root path route ("/")
   root "home#index"
