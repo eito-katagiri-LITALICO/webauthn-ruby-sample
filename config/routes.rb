@@ -14,7 +14,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :sessions, only: %i[new create]
+  resources :sessions, only: %i[new create] do
+    collection do
+      post :callback
+    end
+  end
 
   # Defines the root path route ("/")
   root "home#index"

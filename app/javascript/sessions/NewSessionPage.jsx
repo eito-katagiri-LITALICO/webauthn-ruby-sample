@@ -1,4 +1,8 @@
 import React from "react";
+import {
+    get,
+    parseRequestOptionsFromJSON,
+} from "@github/webauthn-json/browser-ponyfill";
 import { getCsrfToken } from "../getCsrfToken";
 
 export const NewSessionPage = () => {
@@ -17,7 +21,18 @@ export const NewSessionPage = () => {
                 body: JSON.stringify({ email }),
             });
             const json = await session.json();
-            console.log("json", json);
+            const options = parseRequestOptionsFromJSON({ publicKey: json });
+            const response = await get(options);
+            await fetch(`/sessions/callback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCsrfToken(),
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(response),
+            });
+            window.location.href = '/';
         } catch (e) {
             console.error(e);
         }
